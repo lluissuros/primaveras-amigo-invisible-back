@@ -12,8 +12,9 @@ app.use(cors());
 app.use(express.json());
 
 const db = config.get("mongoURI");
-const Animal = require("./models/Animal");
+// const Animal = require("./models/Animal");
 const Confession = require("./models/Confession");
+const Review = require("./models/Review");
 
 mongoose
   .connect(db, {
@@ -31,7 +32,7 @@ app.get("/", (req, res) => {
     .then(items => console.log(res.json(items)));
 });
 
-// Add a new entry
+// Add a new confession entry
 app.post("/", (req, res) => {
   console.log(req.body);
   const newConfession = new Confession({
@@ -48,11 +49,30 @@ app.delete("/:id", (req, res) => {
     .catch(err => res.status(404).json({ success: false }));
 });
 
-// Update an entry
+// Update an entry: use as {myUrl}/s5df8ba8adcef3500175d21a7
 app.put("/:id", (req, res) => {
-  Confession.findOneAndUpdate({ _id: req.params.id }, req.body)
-    .then(() => res.json({ success: true }))
+  Confession.findOneAndUpdate({ _id: req.params.id }, req.body, {
+    new: true
+  })
+    .then(updatedObject =>
+      res.json({ success: true, updatedObject, receivedRequestBody: req.body })
+    )
+    // .then(() => console.log(`PARAMS RECIVED ${req.params}`))
+    // .then(() => res.json({ success: true, paramsReceived: req.params }))
     .catch(err => res.status(404).json({ success: false }));
+});
+
+//======================================= _____REViEWS_______=======================================
+// Add a review entry
+app.post("/review/", (req, res) => {
+  console.log(req.body);
+  const newReview = new Review({
+    userId: req.body.userId,
+    confessionId: req.body.confessionId,
+    score: req.body.score,
+    isSpam: req.body.isSpam
+  });
+  newReview.save().then(item => res.json(item));
 });
 
 const port = process.env.PORT || 5000;
