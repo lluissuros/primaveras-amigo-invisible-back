@@ -17,7 +17,7 @@ const ReviewSchema = new Schema({
     type: Number,
     min: -100,
     max: 100,
-    required: true
+    default: null
   }
 });
 module.exports = mongoose.model("review", ReviewSchema);

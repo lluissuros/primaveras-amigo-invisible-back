@@ -22,7 +22,7 @@ mongoose
     useCreateIndex: true,
     useFindAndModify: false
   })
-  .then(() => console.log("MongoDB Connected..."))
+  .then(() => console.log("MongoDB Connected 2..."))
   .catch(err => console.log(err));
 
 // Read all entries
@@ -63,6 +63,14 @@ app.put("/:id", (req, res) => {
 });
 
 //======================================= _____REViEWS_______=======================================
+
+// Get all reviews
+app.get("/reviews", (req, res) => {
+  Review.find()
+    .sort({ date: -1 })
+    .then(items => console.log(res.json(items)));
+});
+
 // Add a review entry
 app.post("/review/", (req, res) => {
   console.log(req.body);
@@ -72,7 +80,10 @@ app.post("/review/", (req, res) => {
     score: req.body.score,
     isSpam: req.body.isSpam
   });
-  newReview.save().then(item => res.json(item));
+  newReview
+    .save()
+    .then(item => res.json(item))
+    .catch(err => res.status(404).json({ success: false, error: err }));
 });
 
 const port = process.env.PORT || 5000;
